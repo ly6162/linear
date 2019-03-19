@@ -8,6 +8,7 @@ import time
 特徴：学習プロセスをグラフィックで出力しながら、データの収束を可視化していること
 
 """
+model_path="../data/model_numpy/numpy_model.txt"
 
 def _line(x):
     return  x * 2 + 0.5
@@ -15,9 +16,9 @@ def _line(x):
 def init():
     # Define the vector of input samples as x, with 20 values sampled from a uniform distribution
     # between 0 and 1
-    x = np.loadtxt('../data/data_train.txt')
+    x = np.loadtxt('../data/learing_data/data_train.txt')
     #x = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
-    t = np.loadtxt('../data/data_teacher.txt')
+    t = np.loadtxt('../data/learing_data/data_teacher.txt')
 
     # Generate the target values t from x with small gaussian noise so the estimation won't
     # be perfect.
@@ -90,7 +91,7 @@ def train():
     learning_rate = 0.001
     # Start performing the gradient descent updates, and print the weights and cost:
     steps = 10000 # number of gradient descent updates
-    model_path="../model_ML/ML_model.txt"
+
     wb_cost = [(w, b, cost(nn(x, w, b), t))] # List to store the weight,costs values
     #draw_graph(x, w, b, t,0)
     start = time.time()

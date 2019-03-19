@@ -4,12 +4,12 @@ import numpy as np
 os.environ["CUDA_VISIBLE_DEVICES"] ="0"
 #環境：python=3.x ,Tensorflow-gpu=1.9
 
-model_tf_custom="../model_tf_custom/tf_line_model.ckpt"
-model_tf_highAPI="../model_tf_highAPI/2tf_line_model.ckpt"
+model_tf_custom="../data/model_tf_custom/tf_line_model.ckpt"
+model_tf_highAPI="../data/model_tf_highAPI/2tf_line_model.ckpt"
 
 # 学習データと教師データを読み込み
-x_train = np.loadtxt('../data/data_train.txt')
-y_train = np.loadtxt('../data/data_teacher.txt')
+x_train = np.loadtxt('../data/learing_data/data_train.txt')
+y_train = np.loadtxt('../data/learing_data/data_teacher.txt')
 
 #tensorflowの# 従来の APIを利用して開発した、特徴は、計算プロセスは明確的に見えます。
 def train_custom():

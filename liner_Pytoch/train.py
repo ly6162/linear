@@ -7,11 +7,11 @@ import torch.nn.functional as F
 #環境：python=3.x ,pytorch=1.0
 
 # 学習データと教師データを読み込み
-model_path="../model_Pytoch/pytorch_liner_model.pt"
+model_path="../data/model_Pytoch/pytorch_liner_model.pt"
 
 def load_data(tt):
-    x_input = np.loadtxt('../data/data_train.txt',) #学習データ
-    y_input = np.loadtxt('../data/data_teacher.txt')#教師データ
+    x_input = np.loadtxt('../data/learing_data/data_train.txt',) #学習データ
+    y_input = np.loadtxt('../data/learing_data/data_teacher.txt')#教師データ
     x1 = np.reshape(x_input, (-1, 1))
     y1=np.reshape(y_input, (-1, 1))
     x_data = tt.FloatTensor(x1)
