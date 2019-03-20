@@ -1,18 +1,25 @@
+import os
 import torch
-import pickle
-from ML_liner import inference as eval
-import matplotlib.pyplot as plt
+from hparam import hparam
+from linear_numpy import inference
 
-from pytoch_liner import liner_model
-# our model
-model_path="../model_Pytoch/pytorch_liner_model.pt"
+def get_param():
+    path = os.path.join(hparam.save, "model_Pytorch")
+    model_path = os.path.join(path, "ckpt_pytorch_linear.pt")
+    #load  model
+    model = torch.load(model_path)
 
-model=(torch.load(model_path))
-weight=model["weight"].numpy()
-bias=model["bias"].numpy()
-def out_text():
-    print("weight: %s bias: %s"%(weight,bias))
+    if model.name == "nn":
+        #GPUのtensorは直接にnumpyに変更できない,一応cpu変換必要
+        # model_cpu = model.cpu()
+        weight = model.linear_model.weight.data.numpy()[0]
+        bias= model.linear_model.bias.data.numpy()
+    elif model.name=="my":
+        weight=model.W.data.numpy()
+        bias=model.b.data.numpy()
+    return weight,bias
+
 if __name__ == "__main__":
-    out_text()
-    eval.eval_graph("Pytoch",.1,weight,bias)
-    #W: [1.9103621] b: [-0.06653841]
+    weight, bias=get_param()
+    print("weight: %s bias: %s" % (weight, bias))
+    inference.eval_graph("Pytoch", .1, weight, bias)

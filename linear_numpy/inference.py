@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import json
+import data
 
 def nn(x, w, b):
     return x * w + b
@@ -8,8 +9,7 @@ def nn(x, w, b):
 def eval_graph(framework,input,weight,bias):
 
     print("intpu: %s"%input)
-    x = np.loadtxt('../data/data_train.txt')
-    t = np.loadtxt('../data/data_teacher.txt')
+    x, t = data.load()
     def fun(x):
         y=x*weight+bias
         return y

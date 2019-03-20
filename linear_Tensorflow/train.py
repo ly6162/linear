@@ -1,36 +1,38 @@
 import tensorflow as tf
 import time,os
 import numpy as np
+import data
+from hparam import hparam
 os.environ["CUDA_VISIBLE_DEVICES"] ="0"
-#環境：python=3.x ,Tensorflow-gpu=1.9
 
 model_tf_custom="../data/model_tf_custom/tf_line_model.ckpt"
 model_tf_highAPI="../data/model_tf_highAPI/2tf_line_model.ckpt"
 
-# 学習データと教師データを読み込み
-x_train = np.loadtxt('../data/learing_data/data_train.txt')
-y_train = np.loadtxt('../data/learing_data/data_teacher.txt')
+class linear():
+    def __init__(self):
+        # W,bの変数を定義
+        self.W = tf.Variable([.0], dtype=tf.float32)
+        self.b = tf.Variable([.0], dtype=tf.float32)
+
+        # x,yの入力データの変数を定義
+        self.x = tf.placeholder(tf.float32) #学習データ
+        self.y = tf.placeholder(tf.float32) #教師データ
+
+        # 線形モデル定義
+        linear_model = self.W * self.x + self.b
+
+        # 損失関定義
+        self.loss = tf.reduce_sum(tf.square(linear_model - self.y))
+        # 学習率
+        optimizer = tf.train.GradientDescentOptimizer(hparam.learning_rate)
+        #最適化方式（小さい方式）
+        self.train = optimizer.minimize(self.loss)
 
 #tensorflowの# 従来の APIを利用して開発した、特徴は、計算プロセスは明確的に見えます。
 def train_custom():
-    # W,bの変数を定義
-    W = tf.Variable([0.5], dtype=tf.float32)
-    b = tf.Variable([0.5], dtype=tf.float32)
 
-    # x,yの入力データの変数を定義
-    x = tf.placeholder(tf.float32) #学習データ
-    y = tf.placeholder(tf.float32) #教師データ
-
-    # 線形モデル定義
-    linear_model = W * x + b
-
-    # 損失関定義
-    loss = tf.reduce_sum(tf.square(linear_model - y))
-    # 学習率
-    optimizer = tf.train.GradientDescentOptimizer(0.001)
-    #最適化方式（小さい方式）
-    train = optimizer.minimize(loss)
-
+    model=linear()
+    x_input, y_input = data.load()
     # Session を定義、
     sess = tf.Session(config=tf.ConfigProto(
         allow_soft_placement=True, log_device_placement=False))
@@ -39,13 +41,12 @@ def train_custom():
     init = tf.global_variables_initializer()
     sess.run(init)
 
-    # 100000回で学習させ
     start = time.time()
-    for i in range(7000):
+    for i in range(hparam.steps):
 
-        sess.run(train, {x: x_train, y: y_train})
-        if i%1000==0:
-            print("step:%s"%i, sess.run(loss,{x: x_train, y: y_train}))
+        sess.run(model.train, {model.x: x_input, model.y: y_input})
+        if i%hparam.log_step==0:
+            print("step:%s"%i, sess.run(model.loss,{model.x: x_input, model.y: y_input}))
     print('train time: %.5f' % (time.time()-start))
 
     # Sessionごとを保存
@@ -53,7 +54,7 @@ def train_custom():
     saver.save(sess, model_tf_custom)
     print(model_tf_custom)
     # 学習結果を確認
-    print('weight: %s bias: %s loss: %s' % (sess.run(W), sess.run(b), sess.run(loss,{x: x_train, y: y_train})))
+    print('weight: %s bias: %s loss: %s' % (sess.run(model.W), sess.run(b), sess.run(model.loss,{model.x: x_train, model.y: y_train})))
 
 #tensorflowの高級 APIを利用して開発した、特徴は、学習と推論はより簡単になった、それらの処理はtensorflow内部側やってくれます。
 #この例は開発中、推論の部分は未完成です。
