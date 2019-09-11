@@ -1,16 +1,17 @@
 import torch
+import torch.nn.functional as F
 from hparam import hparam
 
 #Defined class of model and use Pytorch function
 class Model_torch(torch.nn.Module):
-    def __init__(self,tt):
+    def __init__(self):
         super(Model_torch, self).__init__()
         # One in and one out
-        self.linear_model = tt.nn.Linear(1, 1)
+        self.linear_model = torch.nn.Linear(1, 1)
         # Defined loss function
-        self.criterion = tt.nn.MSELoss(size_average=False)
+        self.criterion = torch.nn.MSELoss(size_average=False)
         # Defined optimizer
-        self.optimizer = tt.optim.SGD(self.linear_model.parameters(), lr=hparam.learning_rate)
+        self.optimizer = torch.optim.SGD(self.linear_model.parameters(), lr=hparam.learning_rate)
         self.name="nn"
 
     def forward(self, x):
@@ -34,6 +35,7 @@ class Model_my(object):
         #勾配法
         self.optimizer= torch.optim.SGD((self.W, self.b), lr=hparam.learning_rate)
         self.name = "my"
+
     def linear_model(self,x):
         # 線形モデル計算式(計算グラフを構築)
         linear_model = self.W * x + self.b

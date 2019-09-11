@@ -36,16 +36,21 @@ def out_log(step,loss,model):
     print("loss:%s weights:%s bias:%s" % (loss, w, b))
 
 def train():
+
+    #torchのnnを使ってグラフを構築
+    model = line.Model_torch()
+
     if torch.cuda.is_available():
-        model = line.Model_torch().cuda()
         tt = torch.cuda
+        model.cuda()
+
     else:
         tt = torch
-    #torchのnnを使ってグラフを構築
-    #model = line.Model_torch(tt)
+        #torchのnnを使ってグラフを構築
+        model = line.Model_torch()
 
     #torchのnnを使わずに、グラフを自定義
-    model=line.Model_my(tt)
+    #model=line.Model_my(tt)
 
     #最適化関数
     optimizer=model.optimizer

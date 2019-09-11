@@ -8,6 +8,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] ="0"
 model_tf_custom="../data/model_tf_custom/tf_line_model.ckpt"
 model_tf_highAPI="../data/model_tf_highAPI/2tf_line_model.ckpt"
 
+x_input, y_input = data.load()
 class linear():
     def __init__(self):
         # W,bの変数を定義
@@ -32,7 +33,6 @@ class linear():
 def train_custom():
 
     model=linear()
-    x_input, y_input = data.load()
     # Session を定義、
     sess = tf.Session(config=tf.ConfigProto(
         allow_soft_placement=True, log_device_placement=False))
@@ -54,7 +54,7 @@ def train_custom():
     saver.save(sess, model_tf_custom)
     print(model_tf_custom)
     # 学習結果を確認
-    print('weight: %s bias: %s loss: %s' % (sess.run(model.W), sess.run(b), sess.run(model.loss,{model.x: x_train, model.y: y_train})))
+    print('weight: %s bias: %s loss: %s' % (sess.run(model.W), sess.run(model.b), sess.run(model.loss,{model.x: x_input, model.y: y_input})))
 
 #tensorflowの高級 APIを利用して開発した、特徴は、学習と推論はより簡単になった、それらの処理はtensorflow内部側やってくれます。
 #この例は開発中、推論の部分は未完成です。
@@ -64,11 +64,12 @@ def train_high_API():
         W = tf.get_variable("W", [1], dtype=tf.float64)
         b = tf.get_variable("b", [1], dtype=tf.float64)
         y = W * features['x'] + b
-        # 构建损失模型
-        loss = tf.reduce_sum(tf.square(y - labels))
+
+        loss = tf.reduce_sum(tf.square(labels-y))
+        #tf.reduce_sum(tf.square(linear_model - self.y))
         # 学習子グラフィック
         global_step = tf.train.get_global_step()
-        optimizer = tf.train.GradientDescentOptimizer(0.01)
+        optimizer = tf.train.GradientDescentOptimizer(hparam.learning_rate)
         train = tf.group(optimizer.minimize(loss),
                          tf.assign_add(global_step, 1))
         # EstimatorSpecをと通じて学習
@@ -81,30 +82,25 @@ def train_high_API():
 
     def train():
         # 学習などの設定
-        estimator = tf.estimator.Estimator(model_fn=model_fn,model_dir=model_tf_highAPI)
+        estimator = tf.estimator.Estimator(model_fn=model_fn,model_dir="/home/liu/tf/test")
 
         x_eavl = np.array([2., 5., 7., 9.])
         y_eavl = np.array([7.6, 17.2, 23.6, 28.8])
+        for i in range(3):
+            train_input_fn = tf.estimator.inputs.numpy_input_fn(
+                {"x": x_input}, y_input, batch_size=hparam.batch_size, num_epochs=hparam.steps, shuffle=True)
+            estimator.train(input_fn=train_input_fn)
 
-        train_input_fn = tf.estimator.inputs.numpy_input_fn(
-            {"x": x_train}, y_train, batch_size=2, num_epochs=None, shuffle=True)
-        estimator.train(input_fn=train_input_fn, steps=1000)
+            eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+                {"x": x_eavl}, y_eavl, batch_size=hparam.batch_size, num_epochs=hparam.log_step, shuffle=False)
 
-        train_input_fn_2 = tf.estimator.inputs.numpy_input_fn(
-            {"x": x_train}, y_train, batch_size=2, num_epochs=1000, shuffle=False)
+            train_metrics = estimator.evaluate(input_fn=train_input_fn)
+            print("train metrics: %r" % train_metrics)
 
-        eval_input_fn = tf.estimator.inputs.numpy_input_fn(
-            {"x": x_eavl}, y_eavl, batch_size=2, num_epochs=1000, shuffle=False)
-
-
-        train_metrics = estimator.evaluate(input_fn=train_input_fn_2)
-        print("train metrics: %r" % train_metrics)
-
-        eval_metrics = estimator.evaluate(input_fn=eval_input_fn)
-        print("eval metrics: %s" % eval_metrics)
-    estimator1 = tf.estimator.Estimator(model_fn=model_fn,model_dir=model_tf_highAPI)
-    print(estimator1)
+            #eval_metrics = estimator.evaluate(input_fn=eval_input_fn)
+            #print("eval metrics: %s" % eval_metrics)
+    train()
 
 if __name__ == "__main__":
-    #train_high_API()
-    train_custom()
+    train_high_API()
+    #train_custom()
