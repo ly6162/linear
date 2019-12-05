@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from hparam import hparam
+from hparam import hparams
 
 #Defined class of model and use Pytorch function
 class Model_torch(torch.nn.Module):
@@ -11,7 +11,7 @@ class Model_torch(torch.nn.Module):
         # Defined loss function
         self.criterion = torch.nn.MSELoss(size_average=False)
         # Defined optimizer
-        self.optimizer = torch.optim.SGD(self.linear_model.parameters(), lr=hparam.learning_rate)
+        self.optimizer = torch.optim.SGD(self.linear_model.parameters(), lr=hparams.learning_rate)
         self.name="nn"
 
     def forward(self, x):
@@ -33,7 +33,7 @@ class Model_my(object):
         self.b = tt.FloatTensor([.0])
         self.b.requires_grad=True
         #勾配法
-        self.optimizer= torch.optim.SGD((self.W, self.b), lr=hparam.learning_rate)
+        self.optimizer= torch.optim.SGD((self.W, self.b), lr=hparams.learning_rate)
         self.name = "my"
 
     def linear_model(self,x):

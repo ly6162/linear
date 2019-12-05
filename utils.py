@@ -1,6 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy as np
+from hparam import hparams
+
+def loadData():
+    # train data
+    x_input = np.loadtxt(hparams.train)
+    # teacher data
+    y_input = np.loadtxt(hparams.teach)
+    return x_input,y_input
+
+def draw_graph(x,y, w, b, t,step):
+    plt.plot(x, t, 'o', label="dots")
+    plt.plot(x, y, label="line")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.axis([-0.5, 2, -0.5, 2]);
+    plt.title('linear regression: train of step :%s'%step)
+    plt.legend()    # 各グラフの説明
+    plt.show()
+
 def datagen():
     def f(x):
         return x * 2
@@ -26,10 +44,3 @@ def datagen():
     plt.grid()
     plt.legend(loc=2)
     plt.show()
-
-def main():
-    datagen()
-
-
-if __name__ == "__main__":
-    main()

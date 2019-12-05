@@ -1,10 +1,10 @@
 import os
 import torch
-from hparam import hparam
+from hparam import hparams
 from linear_numpy import inference
 
 def get_param():
-    path = os.path.join(hparam.save, "model_Pytorch")
+    path = os.path.join(hparams.save, "model_Pytorch")
     model_path = os.path.join(path, "ckpt_pytorch_linear.pt")
     #load  model
     model = torch.load(model_path)

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import json
-import data
+import utils
 
 def nn(x, w, b):
     return x * w + b
@@ -9,7 +9,7 @@ def nn(x, w, b):
 def eval_graph(framework,input,weight,bias):
 
     print("intpu: %s"%input)
-    x, t = data.load()
+    x, t = utils.loadData()
     def fun(x):
         y=x*weight+bias
         return y
@@ -36,7 +36,6 @@ def eval_graph(framework,input,weight,bias):
     plt.grid()
     plt.legend(loc=2)
 
-
     plt.xlabel("x")
     plt.ylabel("y")
     plt.axis([-0, 2, -0, 2]);
@@ -45,10 +44,11 @@ def eval_graph(framework,input,weight,bias):
     plt.show()
 
 if __name__ == "__main__":
-    model_path="../model_ML/ML_model.txt"
+    model_path="../data/model_numpy/numpy_model.txt"
     with open(model_path, "r") as f:
         model = json.load(f)
 
     weight = model["weight"]
     bias = model["bias"]
-    eval_graph("machine learning",0.1,weight,bias)
+    input=0.6
+    eval_graph("machine learning",input,weight,bias)

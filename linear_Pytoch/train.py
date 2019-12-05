@@ -1,25 +1,26 @@
 import os
-import io
 import numpy as np
 import time
 import torch
-from hparam import hparam
-import data
+import matplotlib.pyplot as plt
+
+from hparam import hparams
 import linear_Pytoch.linear_model as line
+import utils
 
 def set_data(tt):
     #load data of txt to numpy
-    x_input,y_input= data.load()
+    x_input,y_input= utils.loadData()
     #
     x = np.reshape(x_input, (-1, 1))
     y=np.reshape(y_input, (-1, 1))
     #Defined a tensor data
     x_data = tt.FloatTensor(x)
     y_data = tt.FloatTensor(y)
-    return x_data,y_data
+    return x_input,y_input,x_data,y_data
 
 def save(model):
-    path=os.path.join(hparam.save,"model_Pytorch")
+    path=os.path.join(hparams.save,"model_Pytorch")
     if not os.path.exists(path):
         os.mkdir(path)
     model_path = os.path.join(path, "ckpt_pytorch_linear.pt")
@@ -31,9 +32,12 @@ def out_log(step,loss,model):
         loss, w, b = loss.item(),model.linear_model.weight.item(), model.linear_model.bias.item()
     elif model.name == "my":
         loss, w, b = loss.item(), model.W.data.item(), model.b.data.item()
+    print("step:%s loss:%s" % (step,loss))
+    return w ,b
 
-    print("step:%s" % step, )
-    print("loss:%s weights:%s bias:%s" % (loss, w, b))
+# Define the neural network function y = x * w + b
+def nn(x, w, b):
+    return x * w + b
 
 def train():
 
@@ -54,17 +58,32 @@ def train():
 
     #最適化関数
     optimizer=model.optimizer
-    x_data,y_data=set_data(tt)
+    x,t,x_data,y_data=set_data(tt)
     # Training: forward, loss, backward, step
     # Training loop
     start = time.time()
-    for step in range(hparam.steps):
+    #plt.axis([0, 100, 0, 1])
+    #plt.ion()
+    w,b=0,0
+    for step in range(hparams.steps+1):
+        time.sleep(0.001)
         # Forward pass
         y_pred = model.linear_model(x_data)
         loss=model.loss(y_pred,y_data)
 
-        if step%hparam.log_step==0:
-                out_log(step,loss,model)
+        if step%hparams.log_step==0 or step==hparams.steps:
+            w,b= out_log(step,loss,model)
+
+            # Visualization of learning process
+            y = nn(x, w, b)
+            plt.plot(x, t, 'o', label="dots")
+            plt.plot(x, y, label="line")
+            plt.xlabel("x")
+            plt.ylabel("y")
+            plt.axis([-0.5, 2, -0.5, 2])
+            plt.title('linear regression: train of step :%s' % step)
+            plt.pause(0.1)
+            plt.cla()
 
         # Zero gradients
         optimizer.zero_grad()
@@ -72,9 +91,13 @@ def train():
         loss.backward()
         # update weights
         optimizer.step()
-
-    print('train time(sec): %.5f' % (time.time()-start))
+    plt.ioff()
     save(model)
+    print('train time: %.5f' % (time.time()-start))
+    print('weight: %s bias: %s loss: %s' %(w,b,loss))
+    utils.draw_graph(x, nn(x, w, b),w, b, t,step)
+
+
 
 if __name__ == "__main__":
     train()
