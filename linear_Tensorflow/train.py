@@ -1,14 +1,15 @@
 import tensorflow as tf
 import time,os
 import numpy as np
-import data
-from hparam import hparam
-os.environ["CUDA_VISIBLE_DEVICES"] ="0"
+import utils
+from hparam import hparams
+import matplotlib.pyplot as plt
+#os.environ["CUDA_VISIBLE_DEVICES"] ="0"
 
 model_tf_custom="../data/model_tf_custom/tf_line_model.ckpt"
 model_tf_highAPI="../data/model_tf_highAPI/2tf_line_model.ckpt"
 
-x_input, y_input = data.load()
+x_input, y_input = utils.loadData()
 class linear():
     def __init__(self):
         # W,bの変数を定義
@@ -24,8 +25,8 @@ class linear():
 
         # 損失関定義
         self.loss = tf.reduce_sum(tf.square(linear_model - self.y))
-        # 学習率
-        optimizer = tf.train.GradientDescentOptimizer(hparam.learning_rate)
+        # 学習率と最適化方式を指定
+        optimizer = tf.train.GradientDescentOptimizer(hparams.learning_rate)
         #最適化方式（小さい方式）
         self.train = optimizer.minimize(self.loss)
 
@@ -42,11 +43,26 @@ def train_custom():
     sess.run(init)
 
     start = time.time()
-    for i in range(hparam.steps):
+    plt.ion()
+    for step in range(hparams.train_steps+1):
 
         sess.run(model.train, {model.x: x_input, model.y: y_input})
-        if i%hparam.log_step==0:
-            print("step:%s"%i, sess.run(model.loss,{model.x: x_input, model.y: y_input}))
+        if (step % hparams.valid_steps == 0 or step == hparams.valid_steps):
+            loss = sess.run(model.loss,{model.x: x_input, model.y: y_input})
+            w = sess.run(model.W)
+            b = sess.run(model.b)
+            print("step:%s loss: %s"%(step , loss))
+            # Visualization of learning process
+            y = utils.liner(x_input, w, b)
+            plt.plot(x_input, y_input, 'o', label="dots")
+            plt.plot(x_input, y, label="line")
+            plt.xlabel("x")
+            plt.ylabel("y")
+            plt.axis([-0.5, 2, -0.5, 2])
+            plt.title('linear regression for TensorFlow: train of step :%s' % step)
+            plt.pause(0.5)
+            plt.cla()
+    plt.ioff()
     print('train time: %.5f' % (time.time()-start))
 
     # Sessionごとを保存
@@ -55,6 +71,7 @@ def train_custom():
     print(model_tf_custom)
     # 学習結果を確認
     print('weight: %s bias: %s loss: %s' % (sess.run(model.W), sess.run(model.b), sess.run(model.loss,{model.x: x_input, model.y: y_input})))
+    utils.draw_graph("TensorFlow", x_input, utils.liner(x_input, w, b), w, b, y_input, step)
 
 #tensorflowの高級 APIを利用して開発した、特徴は、学習と推論はより簡単になった、それらの処理はtensorflow内部側やってくれます。
 #この例は開発中、推論の部分は未完成です。
@@ -102,5 +119,5 @@ def train_high_API():
     train()
 
 if __name__ == "__main__":
-    train_high_API()
-    #train_custom()
+   #train_high_API()
+    train_custom()

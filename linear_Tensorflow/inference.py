@@ -1,7 +1,6 @@
 import tensorflow as tf
-import ML_liner.inference as infer
-import tensorflow_liner.train as train
-
+from linear_Tensorflow import train
+import utils
 def inference_custom(input):
     weight = tf.Variable([0], dtype=tf.float32)
     bias = tf.Variable([0], dtype=tf.float32)
@@ -19,7 +18,7 @@ def inference_custom(input):
 
         print('W: %s b: %s ' % (w, b))
         #推論関数を呼び出す
-        infer.eval_graph("Tensorflow",input,w,b)
+        utils.eval_graph("Tensorflow",input,w,b)
 
 def inference_TF(input):
     weight = tf.Variable([0], dtype=tf.float32)
@@ -70,5 +69,5 @@ def inference_TF2(input):
 
         #print(w * input + b)
 if __name__ == "__main__":
-    inference_custom(0.1)
-    inference_TF(0.1)
+    inference_custom(0.5)
+    #inference_TF(0.1)

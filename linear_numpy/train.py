@@ -43,22 +43,19 @@ def train():
 
     start = time.time()
 
-    plt.axis([0, 100, 0, 1])
     plt.ion()
+    for step in range(hparams.train_steps+1):
 
-    for step in range(hparams.steps+1):
-        time.sleep(0.001)
         dw, db = delta_wb(w, x, b, t, hparams.learning_rate)  # Get the delta w update
         w = w - dw  # Update the current weight parameter
         b = b - db
         wb_cost.append((w, b, cost(nn(x, w, b), t)))  # Add weight,cost to list
-        loss=str(wb_cost[i][2])
+        loss=str(wb_cost[step][2])
 
-        if step % hparams.log_step==0 or step == hparams.steps:
-            print("step:%s"%i,'loss:%s'%loss)
-
-            weight=wb_cost[i][0]
-            bias = wb_cost[i][1]
+        if step % hparams.valid_steps==0 or step == hparams.train_steps:
+            print("step:%s"%step,'loss:%s'%loss)
+            weight =wb_cost[step][0]
+            bias = wb_cost[step][1]
             dict={"weight":weight,"bias":bias}
 
             #save model
@@ -72,14 +69,14 @@ def train():
             plt.xlabel("x")
             plt.ylabel("y")
             plt.axis([-0.5, 2, -0.5, 2])
-            plt.title('linear regression: train of step :%s' % step)
-            plt.pause(0.1)
+            plt.title('linear regression for Numpy: train of step :%s' % step)
+            plt.pause(0.5)
             plt.cla()
 
     plt.ioff()
     print('train time: %.5f' % (time.time()-start))
     print('weight: %s bias: %s loss: %s' %(weight,bias,loss))
-    utils.draw_graph(x, nn(x, w, b),w, b, t,step)
+    utils.draw_graph("Numpy",x, nn(x, w, b),w, b, t,step)
 
 if __name__ == "__main__":
     train()

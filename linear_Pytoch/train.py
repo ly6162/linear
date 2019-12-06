@@ -35,10 +35,6 @@ def out_log(step,loss,model):
     print("step:%s loss:%s" % (step,loss))
     return w ,b
 
-# Define the neural network function y = x * w + b
-def nn(x, w, b):
-    return x * w + b
-
 def train():
 
     #torchのnnを使ってグラフを構築
@@ -62,27 +58,27 @@ def train():
     # Training: forward, loss, backward, step
     # Training loop
     start = time.time()
-    #plt.axis([0, 100, 0, 1])
-    #plt.ion()
+
+    plt.ion()
     w,b=0,0
-    for step in range(hparams.steps+1):
-        time.sleep(0.001)
+    for step in range(hparams.train_steps+1):
+
         # Forward pass
         y_pred = model.linear_model(x_data)
         loss=model.loss(y_pred,y_data)
 
-        if step%hparams.log_step==0 or step==hparams.steps:
+        if step % hparams.valid_steps==0 or step==hparams.valid_steps:
             w,b= out_log(step,loss,model)
 
             # Visualization of learning process
-            y = nn(x, w, b)
+            y = utils.liner(x, w, b)
             plt.plot(x, t, 'o', label="dots")
             plt.plot(x, y, label="line")
             plt.xlabel("x")
             plt.ylabel("y")
             plt.axis([-0.5, 2, -0.5, 2])
-            plt.title('linear regression: train of step :%s' % step)
-            plt.pause(0.1)
+            plt.title('linear regression for PyToch: train of step :%s' % step)
+            plt.pause(0.5)
             plt.cla()
 
         # Zero gradients
@@ -95,9 +91,7 @@ def train():
     save(model)
     print('train time: %.5f' % (time.time()-start))
     print('weight: %s bias: %s loss: %s' %(w,b,loss))
-    utils.draw_graph(x, nn(x, w, b),w, b, t,step)
-
-
+    utils.draw_graph("Pytoch",x, utils.liner(x, w, b),w, b, t,step)
 
 if __name__ == "__main__":
     train()

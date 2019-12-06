@@ -7,8 +7,8 @@ group.add_argument('-teach',default="../data/learing_data/data_teacher.txt", hel
 group.add_argument('-save',default="../data", help="save a model to path")
 
 group = parser.add_argument_group('train')
-group.add_argument('-steps', default=1000,help="train all steps or num_epochs")
-group.add_argument('-log_step', default=50,help="train all steps")
+group.add_argument('-train_steps', default=1000,help="train all steps or num_epochs")
+group.add_argument('-valid_steps', default=50,help="train all steps")
 group.add_argument('-batch_size', default=100,help="train all steps")
 group.add_argument('-learning_rate', type=float, default=0.001,help="Starting learning rate")
 

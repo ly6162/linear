@@ -1,7 +1,7 @@
 import os
 import torch
 from hparam import hparams
-from linear_numpy import inference
+import utils
 
 def get_param():
     path = os.path.join(hparams.save, "model_Pytorch")
@@ -22,4 +22,4 @@ def get_param():
 if __name__ == "__main__":
     weight, bias=get_param()
     print("weight: %s bias: %s" % (weight, bias))
-    inference.eval_graph("Pytoch", .1, weight, bias)
+    utils.eval_graph("Pytoch", .1, weight, bias)
